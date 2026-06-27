@@ -18,7 +18,7 @@ lxml-html-clean = "*"
 twine = "*"
 requests-file = "*"
 pytest = "*"
-"requests-html" = {path = ".",editable = true}
+requests-html = {path = ".",editable = true}
 sphinx = "*"
 mypy = "*"
 pytest-asyncio = "*"

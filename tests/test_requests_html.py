@@ -69,6 +69,7 @@ def test_containing():
     r = get()
 
     python = r.html.find(containing='python')
+    # This fixture-based page currently yields 191 containing matches with modern parser deps.
     assert len(python) == 191
 
     for e in python:
