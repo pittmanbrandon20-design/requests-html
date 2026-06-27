@@ -797,7 +797,7 @@ class HTMLSession(BaseSession):
     def browser(self):
         if not hasattr(self, "_browser"):
             try:
-                asyncio.get_running_loop()
+                self.loop = asyncio.get_running_loop()
             except RuntimeError:
                 self.loop = asyncio.new_event_loop()
                 asyncio.set_event_loop(self.loop)
