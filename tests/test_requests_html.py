@@ -124,6 +124,94 @@ def test_cookiejar_conversion():
     assert "url" not in rendered
 
 
+def test_cookiejar_conversion_none_optional_attrs():
+    """Attributes that are None (absent) should be omitted from the result."""
+    html = HTML(html="<html></html>")
+    cookie = Cookie(
+        version=0,
+        name="session",
+        value="abc123",
+        port=None,
+        port_specified=False,
+        domain="example.com",
+        domain_specified=True,
+        domain_initial_dot=False,
+        path="/",
+        path_specified=True,
+        secure=False,
+        expires=None,  # None → should be omitted
+        discard=True,
+        comment=None,
+        comment_url=None,
+        rest={},
+        rfc2109=False,
+    )
+
+    rendered = html._convert_cookiejar_to_render(cookie)
+    # expires is None on the Cookie object → should not appear in result
+    assert "expires" not in rendered
+    # url, httpOnly, sameSite are not attributes on http.cookiejar.Cookie
+    assert "url" not in rendered
+    assert "httpOnly" not in rendered
+    assert "sameSite" not in rendered
+
+
+def test_cookiejar_conversion_falsy_secure_preserved():
+    """secure=False is a meaningful falsy value and must be preserved."""
+    html = HTML(html="<html></html>")
+    cookie = Cookie(
+        version=0,
+        name="insecure",
+        value="val",
+        port=None,
+        port_specified=False,
+        domain="example.com",
+        domain_specified=True,
+        domain_initial_dot=False,
+        path="/",
+        path_specified=True,
+        secure=False,  # falsy but meaningful — must be preserved
+        expires=None,
+        discard=True,
+        comment=None,
+        comment_url=None,
+        rest={},
+        rfc2109=False,
+    )
+
+    rendered = html._convert_cookiejar_to_render(cookie)
+    assert "secure" in rendered
+    assert rendered["secure"] is False
+
+
+def test_cookiejar_conversion_expires_zero_preserved():
+    """expires=0 (Unix epoch) is a valid falsy integer and must be preserved."""
+    html = HTML(html="<html></html>")
+    cookie = Cookie(
+        version=0,
+        name="epoch",
+        value="val",
+        port=None,
+        port_specified=False,
+        domain="example.com",
+        domain_specified=True,
+        domain_initial_dot=False,
+        path="/",
+        path_specified=True,
+        secure=False,
+        expires=0,  # falsy but valid — must be preserved
+        discard=True,
+        comment=None,
+        comment_url=None,
+        rest={},
+        rfc2109=False,
+    )
+
+    rendered = html._convert_cookiejar_to_render(cookie)
+    assert "expires" in rendered
+    assert rendered["expires"] == 0
+
+
 def test_default_browser_args_not_shared():
     session_a = HTMLSession()
     session_b = HTMLSession()
@@ -136,6 +224,22 @@ def test_default_browser_args_not_shared():
 
     args_a.append('--example-arg')
     assert args_b == ['--no-sandbox']
+
+
+def test_custom_browser_args():
+    """Custom browser_args are copied; later mutations to the caller's list
+    do not affect the session, and the session does not mutate the caller's list."""
+    custom_args = ['--no-sandbox', '--disable-gpu', '--headless']
+    session = HTMLSession(browser_args=custom_args)
+
+    assert session.browser_args == custom_args
+
+    # The session must store its own copy — mutating the caller's list should
+    # not be reflected inside the session.
+    custom_args.append('--unexpected')
+    assert '--unexpected' not in session.browser_args
+    assert session.browser_args == ['--no-sandbox', '--disable-gpu', '--headless']
+
 
 
 @pytest.mark.asyncio

@@ -564,6 +564,10 @@ class HTML(BaseParser):
         cookie_render = {}
         def __convert(cookiejar, key):
             value = getattr(cookiejar, key, None)
+            # Omit only attributes that are absent (None). Falsy non-None
+            # values such as False (secure/httpOnly) or 0 (expires) are
+            # intentionally preserved because they carry semantic meaning for
+            # the browser's setCookie API.
             if value is None:
                 return {}
             return {key: value}
@@ -763,7 +767,7 @@ class BaseSession(requests.Session):
         self.hooks['response'].append(self.response_hook)
         self.verify = verify
 
-        self.__browser_args = browser_args or ['--no-sandbox']
+        self.__browser_args = list(browser_args) if browser_args is not None else ['--no-sandbox']
 
     @property
     def browser_args(self):
@@ -792,8 +796,12 @@ class HTMLSession(BaseSession):
     @property
     def browser(self):
         if not hasattr(self, "_browser"):
-            self.loop = asyncio.get_event_loop()
-            if self.loop.is_running():
+            try:
+                self.loop = asyncio.get_running_loop()
+            except RuntimeError:
+                self.loop = asyncio.new_event_loop()
+                asyncio.set_event_loop(self.loop)
+            else:
                 raise RuntimeError("Cannot use HTMLSession within an existing event loop. Use AsyncHTMLSession instead.")
             self._browser = self.loop.run_until_complete(super().browser)
         return self._browser

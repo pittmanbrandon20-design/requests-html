@@ -6,6 +6,16 @@ Requests-HTML: HTML Parsing for Humans™
 .. image:: https://github.com/pittmanbrandon20-design/requests-html/actions/workflows/tests.yml/badge.svg?branch=master
     :target: https://github.com/pittmanbrandon20-design/requests-html/actions/workflows/tests.yml
 
+.. note::
+
+   **Python compatibility:** This fork requires **Python 3.10 or later**.
+   Python 3.6–3.9 are no longer supported.  If you need to run on an older
+   Python version, pin ``requests-html<0.10.0``.
+
+   This is a maintained fork of `psf/requests-html
+   <https://github.com/psf/requests-html>`_.  See `CHANGELOG.md
+   <CHANGELOG.md>`_ for what has changed.
+
 This library intends to make parsing HTML (e.g. scraping the web) as
 simple and intuitive as possible.
 
@@ -253,10 +263,13 @@ Installation
     $ pip install requests-html
     ✨🍰✨
 
-Only **Python 3.10 and above** is supported.
+**Requires Python 3.10 or above.**  If you are upgrading from a version that
+supported Python 3.6–3.9, please read the `CHANGELOG <CHANGELOG.md>`_ before
+upgrading.
 
 For local development:
 
 .. code-block:: shell
 
     $ python -m pip install -e ".[dev]"
+
