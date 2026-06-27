@@ -564,7 +564,7 @@ class HTML(BaseParser):
         cookie_render = {}
         def __convert(cookiejar, key):
             value = getattr(cookiejar, key, None)
-            if not value:
+            if value is None:
                 return {}
             return {key: value}
 
@@ -764,6 +764,10 @@ class BaseSession(requests.Session):
         self.verify = verify
 
         self.__browser_args = browser_args or ['--no-sandbox']
+
+    @property
+    def browser_args(self):
+        return self.__browser_args
 
 
     def response_hook(self, response, **kwargs) -> HTMLResponse:

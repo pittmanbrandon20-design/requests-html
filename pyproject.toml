@@ -32,7 +32,7 @@ dependencies = [
   "beautifulsoup4",
   "w3lib",
   "pyppeteer>=0.0.14",
-  "lxml_html_clean",
+  "lxml-html-clean",
 ]
 
 [project.optional-dependencies]

@@ -69,7 +69,7 @@ def test_containing():
     r = get()
 
     python = r.html.find(containing='python')
-    assert len(python) >= 190
+    assert len(python) == 191
 
     for e in python:
         assert 'python' in e.full_text.lower()
@@ -126,8 +126,8 @@ def test_default_browser_args_not_shared():
     session_a = HTMLSession()
     session_b = HTMLSession()
 
-    args_a = session_a._BaseSession__browser_args
-    args_b = session_b._BaseSession__browser_args
+    args_a = session_a.browser_args
+    args_b = session_b.browser_args
     assert args_a == ['--no-sandbox']
     assert args_b == ['--no-sandbox']
     assert args_a is not args_b
