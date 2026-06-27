@@ -1,5 +1,5 @@
 [[source]]
-url = "https://pypi.python.org/simple"
+url = "https://pypi.org/simple"
 verify_ssl = true
 name = "pypi"
 
@@ -11,18 +11,18 @@ parse = "*"
 "bs4" = "*"
 "w3lib" = "*"
 pyppeteer = "*"
+lxml-html-clean = "*"
 "rfc3986" = "*"
 
 [dev-packages]
 twine = "*"
 requests-file = "*"
 pytest = "*"
-e1839a8 = {path = ".",editable = true}
+"requests-html" = {path = ".",editable = true}
 sphinx = "*"
 mypy = "*"
 pytest-asyncio = "*"
-white = "*"
+black = "*"
 
 [scripts]
-tests = "pytest -v -m 'not internet' "
-
+tests = "pytest -v -m 'not internet and not render'"

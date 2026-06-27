@@ -24,7 +24,7 @@ def test_pagination(url: str):
 @pytest.mark.parametrize('url', urls)
 @pytest.mark.internet
 @pytest.mark.asyncio
-async def test_async_pagination(event_loop, url):
+async def test_async_pagination(url):
     asession = AsyncHTMLSession()
 
     r = await asession.get(url)
