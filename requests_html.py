@@ -564,6 +564,10 @@ class HTML(BaseParser):
         cookie_render = {}
         def __convert(cookiejar, key):
             value = getattr(cookiejar, key, None)
+            # Omit only attributes that are absent (None). Falsy non-None
+            # values such as False (secure/httpOnly) or 0 (expires) are
+            # intentionally preserved because they carry semantic meaning for
+            # the browser's setCookie API.
             if value is None:
                 return {}
             return {key: value}

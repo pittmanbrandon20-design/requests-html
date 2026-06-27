@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "requests-html"
-version = "0.10.0"
+version = "0.10.1"
 description = "HTML Parsing for Humans."
 readme = "README.rst"
 requires-python = ">=3.10"
@@ -12,7 +12,6 @@ authors = [
   { name = "Kenneth Reitz", email = "me@kennethreitz.org" }
 ]
 license = { text = "MIT" }
-urls = { Homepage = "https://github.com/psf/requests-html" }
 classifiers = [
   "License :: OSI Approved :: MIT License",
   "Programming Language :: Python",
@@ -44,7 +43,13 @@ dev = [
   "sphinx",
   "mypy",
   "black",
+  "pytest-timeout",
 ]
+
+[project.urls]
+Homepage = "https://github.com/pittmanbrandon20-design/requests-html"
+Repository = "https://github.com/pittmanbrandon20-design/requests-html"
+"Bug Tracker" = "https://github.com/pittmanbrandon20-design/requests-html/issues"
 
 [tool.setuptools]
 py-modules = ["requests_html"]
