@@ -1,9 +1,7 @@
-#!/bin/bash
-set -euo pipefail
+from requests_html import HTMLSession
 
-echo "== docs/source/scrape.py =="
-nl -ba docs/source/scrape.py
+session = HTMLSession()
+r = session.get("https://example.com")
 
-echo
-echo "== locate HTMLSession close definition and get usage =="
-rg -n "class HTMLSession|def close|def get\\(" requests_html.py docs/source -n
+print("Status:", r.status_code)
+print("Title:", r.html.find("title", first=True).text)
