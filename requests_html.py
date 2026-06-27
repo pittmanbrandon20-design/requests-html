@@ -767,7 +767,7 @@ class BaseSession(requests.Session):
         self.hooks['response'].append(self.response_hook)
         self.verify = verify
 
-        self.__browser_args = browser_args or ['--no-sandbox']
+        self.__browser_args = list(browser_args) if browser_args is not None else ['--no-sandbox']
 
     @property
     def browser_args(self):

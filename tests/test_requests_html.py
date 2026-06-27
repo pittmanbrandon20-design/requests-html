@@ -227,18 +227,18 @@ def test_default_browser_args_not_shared():
 
 
 def test_custom_browser_args():
-    """Custom browser_args should be passed through and not mutated."""
+    """Custom browser_args are copied; later mutations to the caller's list
+    do not affect the session, and the session does not mutate the caller's list."""
     custom_args = ['--no-sandbox', '--disable-gpu', '--headless']
     session = HTMLSession(browser_args=custom_args)
 
     assert session.browser_args == custom_args
-    # The session should store its own copy, not alias the caller's list
+
+    # The session must store its own copy — mutating the caller's list should
+    # not be reflected inside the session.
     custom_args.append('--unexpected')
-    # Depending on implementation, the session may or may not see the mutation;
-    # what must hold is that the originally-provided args are present.
-    assert '--no-sandbox' in session.browser_args
-    assert '--disable-gpu' in session.browser_args
-    assert '--headless' in session.browser_args
+    assert '--unexpected' not in session.browser_args
+    assert session.browser_args == ['--no-sandbox', '--disable-gpu', '--headless']
 
 
 
