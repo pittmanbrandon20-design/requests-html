@@ -69,7 +69,8 @@ def test_containing():
     r = get()
 
     python = r.html.find(containing='python')
-    # This fixture-based page currently yields 191 containing matches with modern parser deps.
+    # With current parser dependency versions (pyquery/lxml stack), this fixture HTML
+    # consistently produces 191 "containing='python'" matches.
     assert len(python) == 191
 
     for e in python:
