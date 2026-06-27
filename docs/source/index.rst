@@ -13,8 +13,8 @@ Requests-HTML: HTML Parsing for Humans (writing Python 3)!
 
 
 
-.. image:: https://travis-ci.com/psf/requests-html.svg?branch=master
-    :target: https://travis-ci.com/psf/requests-html
+.. image:: https://github.com/pittmanbrandon20-design/requests-html/actions/workflows/tests.yml/badge.svg?branch=master
+    :target: https://github.com/pittmanbrandon20-design/requests-html/actions/workflows/tests.yml
 
 This library intends to make parsing HTML (e.g. scraping the web) as
 simple and intuitive as possible.
@@ -40,10 +40,10 @@ Installation
 
 .. code-block:: shell
 
-    $ pipenv install requests-html
+    $ pip install requests-html
     ✨🍰✨
 
-Only **Python 3.6** is supported.
+Only **Python 3.10 and above** is supported.
 
 
 Tutorial & Usage

@@ -54,11 +54,8 @@ _Next = Union['HTML', List[str]]
 _NextSymbol = List[str]
 
 # Sanity checking.
-try:
-    assert sys.version_info.major == 3
-    assert sys.version_info.minor > 5
-except AssertionError:
-    raise RuntimeError('Requests-HTML requires Python 3.6+!')
+if sys.version_info < (3, 10):
+    raise RuntimeError('Requests-HTML requires Python 3.10+!')
 
 
 class MaxRetries(Exception):
@@ -566,13 +563,10 @@ class HTML(BaseParser):
         # |      * ``sameSite`` (str): ``'Strict'`` or ``'Lax'``
         cookie_render = {}
         def __convert(cookiejar, key):
-            try:
-                v = eval ("cookiejar."+key)
-                if not v: kv = ''
-                else: kv = {key: v}
-            except:
-                kv = ''
-            return kv
+            value = getattr(cookiejar, key, None)
+            if value is None:
+                return {}
+            return {key: value}
 
         keys = [
             'name',
@@ -759,7 +753,7 @@ class BaseSession(requests.Session):
     """
 
     def __init__(self, mock_browser : bool = True, verify : bool = True,
-                 browser_args : list = ['--no-sandbox']):
+                 browser_args: Optional[List[str]] = None):
         super().__init__()
 
         # Mock a web browser's user agent.
@@ -769,7 +763,11 @@ class BaseSession(requests.Session):
         self.hooks['response'].append(self.response_hook)
         self.verify = verify
 
-        self.__browser_args = browser_args
+        self.__browser_args = browser_args or ['--no-sandbox']
+
+    @property
+    def browser_args(self):
+        return self.__browser_args
 
 
     def response_hook(self, response, **kwargs) -> HTMLResponse:
@@ -820,7 +818,13 @@ class AsyncHTMLSession(BaseSession):
                 machine, multiplied by 5. """
         super().__init__(*args, **kwargs)
 
-        self.loop = loop or asyncio.get_event_loop()
+        if loop is None:
+            try:
+                loop = asyncio.get_event_loop()
+            except RuntimeError:
+                loop = asyncio.new_event_loop()
+                asyncio.set_event_loop(loop)
+        self.loop = loop
         self.thread_pool = ThreadPoolExecutor(max_workers=workers)
 
     def request(self, *args, **kwargs):

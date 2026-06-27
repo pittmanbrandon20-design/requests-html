@@ -1,0 +1,50 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "requests-html"
+version = "0.10.0"
+description = "HTML Parsing for Humans."
+readme = "README.rst"
+requires-python = ">=3.10"
+authors = [
+  { name = "Kenneth Reitz", email = "me@kennethreitz.org" }
+]
+license = { text = "MIT" }
+urls = { Homepage = "https://github.com/psf/requests-html" }
+classifiers = [
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: Implementation :: CPython",
+  "Programming Language :: Python :: Implementation :: PyPy",
+]
+dependencies = [
+  "requests",
+  "pyquery",
+  "fake-useragent",
+  "parse",
+  "beautifulsoup4",
+  "w3lib",
+  "pyppeteer>=0.0.14",
+  "lxml-html-clean",
+]
+
+[project.optional-dependencies]
+dev = [
+  "twine",
+  "requests-file",
+  "pytest",
+  "pytest-asyncio",
+  "sphinx",
+  "mypy",
+  "black",
+]
+
+[tool.setuptools]
+py-modules = ["requests_html"]

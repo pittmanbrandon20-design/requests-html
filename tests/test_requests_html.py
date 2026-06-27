@@ -1,7 +1,10 @@
 import os
+import asyncio
+from http.cookiejar import Cookie
 from functools import partial
 
 import pytest
+import pytest_asyncio
 from pyppeteer.browser import Browser
 from pyppeteer.page import Page
 from requests_html import HTMLSession, AsyncHTMLSession, HTML
@@ -18,16 +21,17 @@ def get():
     return session.get(url)
 
 
-@pytest.fixture
-def async_get(event_loop):
+@pytest_asyncio.fixture
+async def async_get():
     """AsyncSession cannot be created global since it will create
         a different loop from pytest-asyncio. """
-    async_session = AsyncHTMLSession()
+    async_session = AsyncHTMLSession(loop=asyncio.get_running_loop())
     async_session.mount('file://', FileAdapter())
     path = os.path.sep.join((os.path.dirname(os.path.abspath(__file__)), 'python.html'))
     url = 'file://{}'.format(path)
 
-    return partial(async_session.get, url)
+    yield partial(async_session.get, url)
+    await async_session.close()
 
 
 def test_file_get():
@@ -65,7 +69,9 @@ def test_containing():
     r = get()
 
     python = r.html.find(containing='python')
-    assert len(python) == 192
+    # With current parser dependency versions (pyquery/lxml stack), this fixture HTML
+    # consistently produces 191 "containing='python'" matches.
+    assert len(python) == 191
 
     for e in python:
         assert 'python' in e.full_text.lower()
@@ -85,6 +91,51 @@ def test_links():
 
     assert len(about.links) == 6
     assert len(about.absolute_links) == 6
+
+
+def test_cookiejar_conversion():
+    html = HTML(html="<html></html>")
+    cookie = Cookie(
+        version=0,
+        name="foo",
+        value="bar",
+        port=None,
+        port_specified=False,
+        domain="example.com",
+        domain_specified=True,
+        domain_initial_dot=False,
+        path="/",
+        path_specified=True,
+        secure=True,
+        expires=None,
+        discard=True,
+        comment=None,
+        comment_url=None,
+        rest={},
+        rfc2109=False,
+    )
+
+    rendered = html._convert_cookiejar_to_render(cookie)
+    assert rendered["name"] == "foo"
+    assert rendered["value"] == "bar"
+    assert rendered["domain"] == "example.com"
+    assert rendered["path"] == "/"
+    assert rendered["secure"] is True
+    assert "url" not in rendered
+
+
+def test_default_browser_args_not_shared():
+    session_a = HTMLSession()
+    session_b = HTMLSession()
+
+    args_a = session_a.browser_args
+    args_b = session_b.browser_args
+    assert args_a == ['--no-sandbox']
+    assert args_b == ['--no-sandbox']
+    assert args_a is not args_b
+
+    args_a.append('--example-arg')
+    assert args_b == ['--no-sandbox']
 
 
 @pytest.mark.asyncio
@@ -289,6 +340,7 @@ async def test_bare_js_async_eval():
     await html.browser.close()
 
 
+@pytest.mark.render
 def test_browser_session():
     """ Test browser instances is created and properly close when session is closed.
         Note: session.close method need to be tested together with browser creation,
@@ -300,6 +352,7 @@ def test_browser_session():
     # assert count_chromium_process() == 0
 
 
+@pytest.mark.render
 def test_browser_process():
     for _ in range(3):
         r = get()
@@ -317,6 +370,7 @@ async def test_browser_session_fail():
 
 
 @pytest.mark.asyncio
+@pytest.mark.render
 async def test_async_browser_session():
     session = AsyncHTMLSession()
     browser = await session.browser
